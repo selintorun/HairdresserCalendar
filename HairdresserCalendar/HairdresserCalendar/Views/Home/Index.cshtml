@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+@section Styles{
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
+    <link href='/lib/fullcalendar/core/main.css' rel='stylesheet' />
+    <link href='/lib/fullcalendar/daygrid/main.css' rel='stylesheet' />
+    <link href="~/lib/fullcalendar/timegrid/main.css" rel="stylesheet" />
+    <link href="~/lib/fullcalendar/list/main.css" rel="stylesheet" />
+    <link href="~/lib/fullcalendar/bootstrap/main.css" rel="stylesheet" />
+}
+<div class="row">
+    <div class="col-md-2">
+        <div id="otherEvents">
+            <p><strong>Takvime eklemek için sürükle ve bırak.</strong></p>
+            <div class="fc-event">1. Randevu</div><br />
+            <div class="fc-event">2. Randevu</div><br />
+        </div>
+    </div>
+    <div class="col-md-10">
+        <div id="calendar">
+
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone-with-data-10-year-range.js"></script>
+    <script src='~/lib/fullcalendar/core/main.js'></script>
+    <script src="~/lib/fullcalendar/moment/main.js"></script>
+    <script src="~/lib/fullcalendar/moment-timezone/main.js"></script>
+    <script src='/lib/fullcalendar/daygrid/main.js'></script>
+    <script src="~/lib/fullcalendar/timegrid/main.js"></script>
+    <script src="~/lib/fullcalendar/list/main.js"></script>
+    <script src="~/lib/fullcalendar/interaction/main.js"></script>
+    <script src="~/lib/fullcalendar/bootstrap/main.js"></script>
+    <script src="~/lib/fullcalendar/core/locales/tr.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var draggableEl = document.getElementById('otherEvents');
+
+            var Draggable = FullCalendarInteraction.Draggable;
+            new Draggable(draggableEl, {
+                itemSelector: '.fc-event',
+                eventData: function (eventEl) {
+                    return {
+                        title: eventEl.innerText,
+                        duration: '01:00'
+
+                    };
+
+                }
+
+            });
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: ['dayGrid', 'timeGrid', 'list', 'bootstrap', 'interaction', 'momentTimezone'],
+                timeZone: 'Europe/Istanbul',
+                themeSystem: 'bootstrap',
+                bootstrapFontAwesome: {
+                    prev: 'fa-arrow-circle-left',
+                    next: 'fa-arrow-circle-right',
+                    dayGridMonth: 'fa-calendar',
+                    prevYear: 'fa-arrow-circle-left',
+                    nextYear: 'fa-arrow-circle-right',
+                    listWeek: 'fa-list'
+                },
+                locale: 'tr',
+                header: {
+                    left: 'prev, next, today',
+                    center: 'title',
+                    right: 'dayGridMonth, timeGridWeek, timeGridDay, listWeek'
+                },
+                footer: {
+                    left: 'prevYear',
+                    right: 'nextYear'
+                },
+                fixedWeekCount: false,
+                minTime: '08:00:00',
+                slotDuration: '00:15:00',
+                slotLabelInterval: '00:15:00',
+                slotLabelFormat: {
+                    minute: '2-digit',
+                    hour: '2-digit'
+                },
+                eventTimeFormat: {
+                    minute: '2-digit',
+                    hour: '2-digit'
+                },
+                handleWindowResize: true,
+                defaultView: 'dayGridMonth',
+                allDaySlot: false,
+                titleFormat: {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                },
+                columnHeaderFormat: {
+                    weekday: 'long'
+                },
+                buttonText: {
+                    today: 'Bugün'
+                },
+                events: [],
+                selectable: true,
+                droppable: true,
+                select: function (selectionInfo) {
+                    console.log(selectionInfo);
+                },
+                editable: true
+            });
+
+            calendar.render();
+            var events = calendar.getEvents();
+            console.log(events);
+
+            var id = 'x';
+            var event = calendar.getEventById(id);
+            console.log(event.title);
+        });
+
+    </script>
+} 

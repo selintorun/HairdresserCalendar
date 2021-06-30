@@ -1,0 +1,467 @@
+﻿@model StaffViewModel
+@{
+    ViewData["Title"] = "Personel İşlem Sayfası";
+}
+
+@section Styles{
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
+    <link href='/lib/fullcalendar/core/main.css' rel='stylesheet' />
+    <link href='/lib/fullcalendar/daygrid/main.css' rel='stylesheet' />
+    <link href="~/lib/fullcalendar/timegrid/main.css" rel="stylesheet" />
+    <link href="~/lib/fullcalendar/list/main.css" rel="stylesheet" />
+    <link href="~/lib/fullcalendar/bootstrap/main.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css" integrity="sha512-3JRrEUwaCkFUBLK1N8HehwQgu8e23jTH4np5NHOmQOobuC4ROQxFwFgBLTnhcnQRMs84muMh0PnnwXlPq5MGjg==" crossorigin="anonymous" />
+}
+
+<!-- Modals -->
+<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Randevu İşlemi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <form>
+                    <input hidden id="appointmentId" />
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">Başlangıç Tarihi : </label>
+                            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                                <input id="inputStartDate" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" />
+                                <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">Bitiş Tarihi : </label>
+                            <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+                                <input id="inputEndDate" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" />
+                                <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">İsim : </label>
+                            <input id="inputCustomerName" type="text" class="form-control" />
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">Soyisim : </label>
+                            <input id="inputCustomerSurname" type="text" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">Açıklama (İsteğe Bağlı) : </label>
+                            <input id="inputDescription" type="text" class="form-control" />
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">Salon No : </label>
+                            <select id="selectHairdresserId" class="form-control" asp-items="@Model.HairdressersSelectList">
+                                <option value="0">-Seçiniz-</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Kapat</button>
+                <button id="btnSave" type="button" class="btn btn-primary">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Randevu Detayları</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <form>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">Başlangıç Tarihi : </label>
+                            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                                <input disabled id="inputStartDateDetail" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" />
+                                <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">Bitiş Tarihi : </label>
+                            <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+                                <input disabled id="inputEndDateDetail" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" />
+                                <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">İsim : </label>
+                            <input disabled id="inputCustomerNameDetail" type="text" class="form-control" />
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">Soyisim : </label>
+                            <input disabled id="inputCustomerSurnameDetail" type="text" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">Açıklama (İsteğe Bağlı) : </label>
+                            <input disabled id="inputDescriptionDetail" type="text" class="form-control"/>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label class="form-control-label">Salon No : </label>
+                            <select disabled id="selectHairdresserIdDetail" class="form-control" asp-items="@Model.HairdressersSelectList">
+                                <option value="0">-Seçiniz-</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button id="btnDelete" type="button" class="btn btn-danger">Sil</button>
+                <button id="btnUpdate" type="button" class="btn btn-primary">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h1>Personel İşlem Sayfası</h1>
+<br />
+
+<div class="row">
+    <div class="col-md-9">
+        <div id="calendar">
+
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5>@Model.User.Name @Model.User.Surname</h5>
+                <p class="card-text">Tüm randevu işlemlerini takvim üzerinden gerçekleştirebilirsiniz.</p>
+                <a href="/Account/Logout" class="card-link">Yardım</a>
+            </div>
+        </div>
+        <ul class="list-group">
+            <br />
+            <br />
+            <li class="list-group-item active" aria-current="true">Uzman Listesi</li>
+            @foreach (var item in Model.Hairdressers)
+            {
+                <li data-value="@item.Id" class="list-group-item">@item.Name @item.Surname<button type="button" class="btn btn-warning pull-right btn-sm">@item.Color</button></li>
+            }
+        </ul>
+    </div>
+
+
+
+</div>
+
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.28/moment-timezone-with-data-10-year-range.js"></script>
+    <script src='~/lib/fullcalendar/core/main.js'></script>
+    <script src="~/lib/fullcalendar/moment/main.js"></script>
+    <script src="~/lib/fullcalendar/moment-timezone/main.js"></script>
+    <script src='/lib/fullcalendar/daygrid/main.js'></script>
+    <script src="~/lib/fullcalendar/timegrid/main.js"></script>
+    <script src="~/lib/fullcalendar/list/main.js"></script>
+    <script src="~/lib/fullcalendar/interaction/main.js"></script>
+    <script src="~/lib/fullcalendar/bootstrap/main.js"></script>
+    <script src="~/lib/fullcalendar/core/locales/tr.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js" integrity="sha512-k6/Bkb8Fxf/c1Tkyl39yJwcOZ1P4cRrJu77p83zJjN2Z55prbFHxPs9vN7q3l3+tSMGPDdoH51AEU8Vgo1cgAA==" crossorigin="anonymous"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var selectedEvent = null;
+            var events = [];
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: ['dayGrid', 'timeGrid', 'list', 'bootstrap', 'interaction', 'momentTimezone'],
+                timeZone: 'Europe/Istanbul',
+                themeSystem: 'bootstrap',
+                bootstrapFontAwesome: {
+                    prev: 'fa-arrow-circle-left',
+                    next: 'fa-arrow-circle-right',
+                    dayGridMonth: 'fa-calendar',
+                    prevYear: 'fa-arrow-circle-left',
+                    nextYear: 'fa-arrow-circle-right',
+                    listWeek: 'fa-list'
+                },
+                locale: 'tr',
+                header: {
+                    left: 'prev, next, today',
+                    center: 'title',
+                    right: 'dayGridMonth, timeGridWeek, timeGridDay, listWeek'
+                },
+                footer: {
+                    left: 'prevYear',
+                    right: 'nextYear'
+                },
+                fixedWeekCount: false,
+                minTime: '08:00:00',
+                slotDuration: '00:15:00',
+                slotLabelInterval: '00:15:00',
+                slotLabelFormat: {
+                    minute: '2-digit',
+                    hour: '2-digit'
+                },
+                events: [],
+                eventTimeFormat: {
+                    minute: '2-digit',
+                    hour: '2-digit'
+                },
+                handleWindowResize: true,
+                defaultView: 'dayGridMonth',
+                allDaySlot: false,
+                titleFormat: {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                },
+                columnHeaderFormat: {
+                    weekday: 'long'
+                },
+                buttonText: {
+                    today: 'Bugün'
+                },
+
+                selectable: true,
+                droppable: true,
+                select: function (selectionInfo) {
+                    console.log(selectionInfo);
+
+                    selectedEvent = {
+                        id: 0,
+                        start: moment(selectionInfo.start),
+                        end: moment(selectionInfo.end),
+                        customerName: "",
+                        customerSurname: "",
+                        description: "",
+                        hairdresserId: 0
+
+                    }
+                    openAddOrUpdateModal();
+                },
+
+                eventClick: function (info) {
+
+                    selectedEvent = {
+                        id: info.event.id,
+                        start: moment(info.event.start).format('DD/MM/YYYY HH:mm'),
+                        end: moment(info.event.end).format('DD/MM/YYYY HH:mm'),
+                        customerName: info.event.extendedProps.customerName,
+                        customerSurname: info.event.extendedProps.customerSurname,
+                        description: info.event.extendedProps.description,
+                        hairdresserId: info.event.extendedProps.userId
+                    };
+
+                    $('#selectHairdresserIdDetail').val(info.event.extendedProps.userId);
+                    $('#inputStartDateDetail').val(moment(info.event.start).format('DD/MM/YYYY HH:mm'));
+                    $('#inputEndDateDetail').val(moment(info.event.end).format('DD/MM/YYYY HH:mm'));
+                    $('#inputCustomerNameDetail').val(info.event.extendedProps.customerName);
+                    $('#inputCustomerSurnameDetail').val(info.event.extendedProps.customerSurname);
+                    $('#inputDescriptionDetail').val(info.event.extendedProps.description);
+
+                    $('#detailModal').modal();
+                },
+
+                editable: true,
+                eventDrop: function (dropEventInfo) {
+                    var appointment = {
+                        Id: dropEventInfo.event.id,
+                        UserId: dropEventInfo.event.extendedProps.userId,
+                        StartDate: moment(dropEventInfo.event.start).format('DD/MM/YYYY HH:mm'),
+                        EndDate: moment(dropEventInfo.event.end).format('DD/MM/YYYY HH:mm'),
+                        CustomerName: dropEventInfo.event.extendedProps.customerName,
+                        CustomerSurname: dropEventInfo.event.extendedProps.customerSurname,
+                        Description: dropEventInfo.event.description
+
+                    }
+                    saveAppointment(appointment);
+
+                },
+
+                eventResize: function (dropEventInfo) {
+                    var appointment = {
+                        Id: dropEventInfo.event.id,
+                        UserId: dropEventInfo.event.extendedProps.userId,
+                        StartDate: moment(dropEventInfo.event.start).format('DD/MM/YYYY HH:mm'),
+                        EndDate: moment(dropEventInfo.event.end).format('DD/MM/YYYY HH:mm'),
+                        CustomerName: dropEventInfo.event.extendedProps.customerName,
+                        CustomerSurname: dropEventInfo.event.extendedProps.customerSurname,
+                        Description: dropEventInfo.event.description
+
+                    }
+                    saveAppointment(appointment);
+                },
+
+            });
+
+            calendar.render();
+            getAppointments();
+
+            $('#datetimepicker1, #datetimepicker2').datetimepicker({
+                format: 'DD/MM/YYYY HH:mm'
+            });
+
+            function getAppointments() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/Appointment/GetAppointments',
+                    success: function (response) {
+                        events = [];
+                        var sources = calendar.getEventSources();
+                        for (var i = 0; i < sources.length; i++) {
+                            sources[i].remove();
+                        }
+                        for (var i = 0; i < response.length; i++) {
+                            events.push({
+                                id: response[i].id,
+                                title: response[i].hairdresser,
+                                customerName: response[i].customerName,
+                                customerSurname: response[i].customerSurname,
+                                start: response[i].startDate,
+                                end: response[i].endDate,
+                                description: response[i].description,
+                                color: response[i].color,
+                                userId: response[i].userId
+                            });
+                        }
+
+                        calendar.addEventSource(events);
+
+                    },
+                    error: function () {
+                        $('#saveModal').modal('hide');
+                        alert("İşlem gerçekleşmedi!");
+                    }
+
+                });
+            }
+
+            
+
+            function openAddOrUpdateModal() {
+                if (selectedEvent != null) {
+                    $('#appointmentId').val(selectedEvent.id);
+                    $('#inputStartDate').val(selectedEvent.start.format('DD/MM/YYYY HH:mm'));
+                    $('#inputEndDate').val(selectedEvent.end.format('DD/MM/YYYY HH:mm'));
+                    $('#inputCustomerName').val(selectedEvent.customerName);
+                    $('#inputCustomerSurname').val(selectedEvent.customerSurname);
+                    $('#inputDescription').val(selectedEvent.description);
+                    $('#selectHairdresserId').val(selectedEvent.hairdresserId);
+                }
+
+                $('#saveModal').modal();
+            }
+
+            function saveAppointment(data) {
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Appointment/AddOrUpdateAppointment',
+                    data: data,
+                    success: function (response) {
+                        if (response === "200") {
+                            getAppointments();
+                            $('#saveModal').modal('hide');
+                            data.Id === "0" ? alert("Randevu ekleme işlemi başarılı!") : alert("Randevu güncelleme işlemi başarılı!");
+                        }
+                        else {
+                            $('#saveModal').modal('hide');
+                            alert("Randevu ekleme işlemi başarısız!");
+                        }
+                    },
+                    error: function () {
+                        $('#saveModal').modal('hide');
+                        alert("İşlem gerçekleşmedi!");
+                    }
+
+                });
+
+            }
+
+            $('#btnSave').click(function () {
+                if ($('#inputCustomerName').val() === "") {
+                    alert("İsim alanı boş bırakılamaz!");
+                    return;
+                }
+
+                if ($('#inputCustomerSurname').val() === "") {
+                    alert("Soyisim alanı boş bırakılamaz!");
+                    return;
+                }
+
+                var appointment = {
+                    Id: $('#appointmentId').val(),
+                    UserId: $('#selectHairdresserId').val(),
+                    StartDate: $('#inputStartDate').val(),
+                    EndDate: $('#inputEndDate').val(),
+                    CustomerName: $('#inputCustomerName').val(),
+                    CustomerSurname: $('#inputCustomerSurname').val(),
+                    Description: $('#inputDescription').val()
+                }
+
+                saveAppointment(appointment);
+
+            });
+
+            $('#btnUpdate').click(function () {
+                $('#detailModal').modal('hide');
+                openAddOrUpdateModal();
+
+            });
+
+            $('#btnDelete').click(function () {
+                if (confirm('Emin misiniz?')) {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/Appointment/DeleteAppointment?id=' + selectedEvent.id,
+                        success: function (response) {
+                            if (response === '200') {
+                                var event = calendar.getEventById(selectedEvent.id);
+                                event.remove();
+                                $('#detailModal').modal('hide');
+                                alert('İşlem başarılı!');
+                            }
+                        },
+                        error: function () {
+                            $('#detailModal').modal('hide');
+                            alert('İşlem gerçekleşmedi!');
+                        }
+                    });
+                }
+            });
+
+            
+        });
+
+    </script>
+}

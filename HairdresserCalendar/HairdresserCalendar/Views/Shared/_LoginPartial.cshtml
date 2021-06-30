@@ -1,0 +1,22 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+<ul class="navbar-nav">
+@if (User.Identity.IsAuthenticated)
+{
+    <li class="nav-item">
+        <a  class="nav-link text-dark" href="/ProfileRole/Index" title="Manage">Merhaba @User.Identity.Name!</a>
+    </li>
+    <li class="nav-item">
+        <a href="/Account/Logout" class="nav-link btn btn-link text-dark">Çıkış</a>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" href="/Account/Register">Kaydol</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" href="/Account/Login">Giriş Yap</a>
+    </li>
+}
+</ul>
